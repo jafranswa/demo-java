@@ -1,42 +1,30 @@
-import com.sun.tools.javac.util.StringUtils;
-
-import java.io.*;
-import java.lang.reflect.Array;
-import java.math.*;
-import java.security.*;
-import java.text.*;
 import java.util.*;
-import java.util.concurrent.*;
-import java.util.function.*;
-import java.util.regex.*;
-import java.util.stream.*;
+
 import static java.util.stream.Collectors.joining;
-import static java.util.stream.Collectors.toList;
 
 public class Main {
 
+    //encoding functions
     public static boolean isNextInt(Integer itterator, String stringToEncode){
         char nextChar;
         try {
-             nextChar = stringToEncode.charAt(itterator + 1);
+            nextChar = stringToEncode.charAt(itterator + 1);
         }catch (StringIndexOutOfBoundsException e){
             return false;
         }
-        int ascii = (int)nextChar;
-        if(48 <= ascii && ascii <=57){
+        if(Character.isDigit(nextChar)){
             return true;
         }
         return false;
     }
 
-    public static String reverseNumber(String integer){
-        String number = integer;
+    public static String reverseNumber(String number){
         StringBuilder stringBuilder = new StringBuilder(number);
         number = stringBuilder.reverse().toString();
         return number;
     }
 
-    public static String encodeVowelAndY(char letter) {
+    public static String VowelYSpaceToInt(char letter) {
         HashMap<String, String> vowelAndYMap = new HashMap<String, String>() {
             {
                 put("a","1"); put("e","2"); put("i","3"); put("o","4"); put("u","5"); put("y"," "); put(" ","y");
@@ -46,20 +34,37 @@ public class Main {
         return letterNumber;
     }
 
-    public static String backALetter(Character letter){
+    public static String backALetter(char letter){
         int ascii = letter;
         ascii = ascii - 1;
         String backOneLetter = Character.toString((char) ascii);
         return backOneLetter;
     }
 
-    public static boolean isNumber(String character){
+    // sorting functions
+    public static boolean isNumber(char character){
+        String stringChar = Character.toString(character);
         try{
-            Integer.parseInt(character);
+            Integer.parseInt(stringChar);
         }catch (Exception e){
             return false;
         }
         return true;
+    }
+
+    public static boolean isVowel(char character){
+        int ascii = character;
+        if(ascii == 'a' || ascii == 'e' || ascii == 'i' || ascii == 'o' || ascii == 'u' || ascii == 'y' || ascii == ' '){
+            return true;
+        }
+        return false;
+    }
+
+    public static boolean isConsinant(char character){
+        if (character >= 'a' && character<='z' && false == isVowel(character)){
+            return true;
+        }
+        return false;
     }
 
 
@@ -67,17 +72,14 @@ public class Main {
         stringToEncode = stringToEncode.toLowerCase();
         String encodedString = "";
         for(int i=0; i<stringToEncode.length() ;i++){
-            String currentChar = Character.toString(stringToEncode.charAt(i));
-            //determine case
-
-            // is int
+            char currentChar = stringToEncode.charAt(i);
             if(isNumber(currentChar)){
+                // check if next char is int
                 boolean keepLooking = true;
                 String number = "";
                 while (keepLooking == true){
                     if (isNextInt(i, stringToEncode)){
                         number = number + stringToEncode.charAt(i);
-                        //if integers found advance loop
                         i++;
                     }else{
                         number = number + stringToEncode.charAt(i);
@@ -85,25 +87,16 @@ public class Main {
                     }
                 }
                 encodedString = encodedString + reverseNumber(number);
-            // is vowel
-            }else if(currentChar.equals("a") || currentChar.equals("e") || currentChar.equals("i") ||
-                    currentChar.equals("o") || currentChar.equals("u") || currentChar.equals("y")
-                    || currentChar.equals(" ")){
-                encodedString = encodedString + encodeVowelAndY(stringToEncode.charAt(i));
-            // is other char
-            }else if(currentChar.equals("?") ||currentChar.equals("!") ||currentChar.equals(".") ||currentChar.equals("\"")
-                    ||currentChar.equals("\"") ||currentChar.equals("'") ||currentChar.equals(",")){
-                        encodedString = encodedString + currentChar;
-            // is consinant
-            }else{
+            }else if(isVowel(currentChar)){
+                encodedString = encodedString + VowelYSpaceToInt(stringToEncode.charAt(i));
+            }else if(isConsinant(currentChar)){
                 encodedString = encodedString + backALetter(stringToEncode.charAt(i));
-
+            }else{
+                encodedString = encodedString + currentChar;
             }
-
-            }
-        return encodedString;
-
         }
+        return encodedString;
+    }
 
 
 
@@ -112,9 +105,11 @@ public class Main {
         public static void main(String[] args) {
 //        String string = "Hello World!";
 //        System.out.println(encode(string));
-            String a = "Hello World!";
+            String a = "Hello World12!";
             String result = encode(a);
             System.out.println(result);
+
+
 
 
 
